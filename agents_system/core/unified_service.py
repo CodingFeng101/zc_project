@@ -7,7 +7,7 @@ from fastapi import APIRouter
 
 from agents_system.agents.dispatch_agent import DispatchAgent, DispatchRequest
 from agents_system.agents.fill_agent import FillAgent, FillRequest
-# from agents_system.agents.globalqaagent import GlobalQARequest, GlobalQAgent
+from agents_system.agents.globalqaagent import GlobalQARequest, GlobalQAgent
 from agents_system.agents.save_agent import SaveAgent, SaveRequest
 from agents_system.models.doubao import logger
 
@@ -48,7 +48,7 @@ class UnifiedService:
         self.dispatch_agent = DispatchAgent()
         self.fill_agent = FillAgent()
         self.save_agent = SaveAgent()
-        # self.globalqa_agent = GlobalQAgent()
+        self.globalqa_agent = GlobalQAgent()
         self.router = APIRouter(prefix="/unified")
         self._setup_routes()
         logger.info("Initialized UnifiedService")
@@ -153,38 +153,43 @@ class UnifiedService:
                 reference="666"
             )
 
-    # async def _handle_global_qa(self, request: UnifiedRequest) -> UnifiedResponse:
-    #     """
-    #     处理全局QA智能体流程（预留接口）
-    #
-    #     :param request: 原始请求
-    #     """
-    #     try:
-    #         qa_request = GlobalQARequest(
-    #             conversations=request.conversations
-    #         )
-    #         qa_response = await self.globalqa_agent.qa_route(qa_request)
-    #         if not qa_response.success:
-    #             return UnifiedResponse(
-    #                 form=request.form,
-    #                 agent_response=qa_response.response,
-    #                 reference=qa_response.reference,
-    #                 status="1",
-    #             )
-    #         return UnifiedResponse(
-    #             form=request.form,
-    #             agent_response=qa_response.response,
-    #             status="1",
-    #             reference="666"
-    #         )
-    #     except Exception as e:
-    #         logger.error(f"Error in global QA flow: {str(e)}")
-    #         return UnifiedResponse(
-    #             form=request.form,
-    #             agent_response="",
-    #             status="1",
-    #             reference="6"
-    #         )
+    async def _handle_global_qa(self, request: UnifiedRequest) -> UnifiedResponse:
+        """
+        处理全局QA智能体流程（预留接口）
+
+        :param request: 原始请求
+        """
+        try:
+            qa_request = GlobalQARequest(
+                conversations=request.conversations
+            )
+            qa_response = await self.globalqa_agent.qa_route(qa_request)
+            if not qa_response.success:
+                return UnifiedResponse(
+                    form=request.form,
+                    agent_response=qa_response.response,
+                    is_manual=qa_response.is_manual,
+                    reference=qa_response.reference,
+                    status="1",
+                )
+            logger.info(f"全局QA回答: {qa_response.response}")
+            logger.info(f"转人工: {qa_response.is_manual}")
+            logger.info(f"参考信息: {qa_response.reference}")
+            return UnifiedResponse(
+                form=request.form,
+                is_manual=qa_response.is_manual,
+                agent_response=qa_response.response,
+                status="1",
+                reference="666"
+            )
+        except Exception as e:
+            logger.error(f"Error in global QA flow: {str(e)}")
+            return UnifiedResponse(
+                form=request.form,
+                agent_response="",
+                status="1",
+                reference="6"
+            )
 
 
 # 全局统一服务实例

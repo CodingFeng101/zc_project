@@ -18,12 +18,15 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO", alias="LOG_LEVEL")
     LOG_FILE: Optional[str] = Field(default="logs/agents_system.log", alias="LOG_FILE")
 
-    DB_HOST: str = "localhost"
-    DB_NAME: str = "zhongcan_RAG"
-    DB_USER: str = "root"
-    DB_PASSWORD: str = "12345678"
-    EMBEDDING_MODEL: str = "doubao-embedding-large-text-250515"
-    
+    # 数据库配置
+    DB_HOST: str = Field(default="localhost", alias="DB_HOST")
+    DB_NAME: str = Field(default="zhongcan_RAG", alias="DB_NAME")
+    DB_USER: str = Field(default="root", alias="DB_USER")
+    DB_PASSWORD: str = Field(default="12345678", alias="DB_PASSWORD")
+
+    # 嵌入模型配置
+    EMBEDDING_MODEL: str = Field(default="doubao-embedding-large-text-250515", alias="EMBEDDING_MODEL")
+
     class Config:
         env_file = os.path.join(os.path.dirname(__file__), "..", ".env")
         env_file_encoding = "utf-8"

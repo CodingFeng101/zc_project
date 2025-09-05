@@ -1,73 +1,86 @@
 # Agents System
 
-一个基于Python、FastAPI和Pydantic的智能体集合项目。每个子智能体单独处理一类功能，通过统一的注册机制进行管理。
+一个基于豆包大模型的智能代理系统，用于中餐相关的问答、信息填充和数据保存等任务。
+
+## 项目概述
+
+Agents System 是一个多代理协作的智能系统，主要功能包括：
+- 调度代理（Dispatch Agent）：负责任务分发和路由
+- 填充代理（Fill Agent）：负责信息补全和数据填充
+- 全局问答代理（Global QA Agent）：处理通用问答任务
+- 保存代理（Save Agent）：负责数据持久化存储
 
 ## 项目结构
 
 ```
 agents_system/
-├── agents/              # 各个智能体模块
-│   └── text_reviewer.py # 文本审稿智能体示例
-├── core/                # 核心模块
-│   ├── base_agent.py    # 智能体基类
-│   └── registry.py      # 智能体注册机制
-├── config/              # 配置模块
-│   └── settings.py      # 系统配置
-├── models/              # 大模型调用模块
-│   └── llm.py           # 大模型接口
-├── utils/               # 工具模块
-│   └── logger.py        # 统一日志模块
-├── main.py              # 应用入口
-└── requirements.txt     # 项目依赖
+├── main.py                    # 主入口文件
+├── requirements.txt           # 依赖包列表
+├── config/
+│   └── settings.py           # 配置文件
+├── agents/                   # 代理模块
+│   ├── dispatch_agent.py     # 调度代理
+│   ├── fill_agent.py         # 填充代理
+│   ├── globalqaagent.py      # 全局问答代理
+│   └── save_agent.py         # 保存代理
+├── core/                     # 核心模块
+│   ├── base_agent.py         # 基础代理类
+│   ├── registry.py           # 代理注册器
+│   └── unified_service.py    # 统一服务
+├── models/
+│   └── doubao.py            # 豆包模型封装
+├── utils/                    # 工具模块
+│   ├── logger.py            # 日志工具
+│   └── similarity_retrieve.py # 相似度检索
+├── data/
+│   └── qa.sql               # 问答数据
+└── logs/                    # 日志目录
 ```
-
-## 功能特点
-
-1. **模块化设计**：每个子智能体处理一类功能
-2. **统一注册机制**：新增智能体自动注册到系统中
-3. **统一日志模块**：包含模块名、行号、时间戳等信息
-4. **大模型调用模块**：统一处理大模型调用逻辑
-5. **统一配置管理**：系统配置集中管理
 
 ## 快速开始
 
-1. 安装依赖：
-   ```
-   pip install -r requirements.txt
-   ```
+### 环境要求
 
-2. 配置环境变量（可选）：
-   创建 `.env` 文件并配置相关参数
+- Python 3.8+
+- MySQL 数据库
+- 豆包大模型 API 访问权限
 
-3. 运行应用：
-   ```
-   python main.py
-   ```
+### 安装依赖
 
-## API接口
+```bash
+pip install -r requirements.txt
+```
 
-- `GET /` - 根路径，显示系统信息
-- `GET /health` - 健康检查
-- `GET /agents/text_reviewer/info` - 获取文本审稿智能体信息
-- `POST /agents/text_reviewer/review` - 文本审稿
+### 环境配置
 
-## 智能体开发
+1. 复制环境变量模板：
+```bash
+cp .env.example .env
+```
 
-要创建新的智能体：
+2. 编辑 `.env` 文件，配置以下参数：
 
-1. 在 `agents/` 目录下创建新的智能体文件
-2. 继承 [BaseAgent](file:///D:/python_codes/zc_project/agents_system/core/base_agent.py#L7-L35) 基类
-3. 实现 [process()](file:///D:/python_codes/zc_project/agents_system/core/base_agent.py#L24-L35) 方法
-4. 在 [main.py](file:///D:/python_codes/zc_project/agents_system/main.py) 中注册智能体
+```env
+# 项目基本信息
+PROJECT_NAME=Agents System
+PROJECT_VERSION=1.0.0
+DEBUG=False
 
-## 配置说明
+# 豆包大模型配置
+DOUBAO_API_KEY=your_doubao_api_key_here
+DOUBAO_MODEL_NAME=doubao-1-5-pro-32k-250115
 
-通过 [settings.py](file:///D:/python_codes/zc_project/agents_system/config/settings.py) 文件或环境变量配置系统：
+# 日志配置
+LOG_LEVEL=INFO
+LOG_FILE=logs/agents_system.log
 
-- `PROJECT_NAME`: 项目名称
-- `PROJECT_VERSION`: 项目版本
-- `DEBUG`: 调试模式
-- `QWEN_API_KEY`: Qwen API密钥
-- `QWEN_MODEL_NAME`: Qwen模型名称
-- `LOG_LEVEL`: 日志级别
-- `LOG_FILE`: 日志文件路径
+# 嵌入模型配置
+EMBEDDING_MODEL=doubao-embedding-large-text-250515
+```
+
+
+### 运行项目
+
+```bash
+python main.py
+```

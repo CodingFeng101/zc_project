@@ -64,13 +64,13 @@
 #         cursor = conn.cursor(dictionary=True)  # 这里指定dictionary=True
 #
 #         # 只查询指定graph_uuid组的句子
-#         sql = """
+#         data = """
 #         SELECT id, group_uuid, question, answer, vector, vector_model, create_time
 #         FROM sentence_vector
 #         WHERE group_uuid = %s
 #         """
 #
-#         cursor.execute(sql, (graph_uuid,))
+#         cursor.execute(data, (graph_uuid,))
 #         results = cursor.fetchall()  # 现在返回的是字典列表
 #
 #         if not results:
