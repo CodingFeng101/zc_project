@@ -8,8 +8,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.settings import settings
 from core.registry import registry
-from agents.text_reviewer import TextReviewerAgent
-from core.feishu_callback import router as feishu_router
+from agents.dispatch_agent import DispatchAgent
+from agents.fill_agent import FillAgent
+from agents.save_agent import SaveAgent
+from core.unified_service import unified_service
+
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -31,13 +34,21 @@ app.add_middleware(
 )
 
 # 注册智能体
-text_reviewer = TextReviewerAgent()
-registry.register("text_reviewer", TextReviewerAgent)
+dispatch_agent = DispatchAgent()
+fill_agent = FillAgent()
+save_agent = SaveAgent()
+
+registry.register("dispatch_agent", DispatchAgent)
+registry.register("fill_agent", FillAgent)
+registry.register("save_agent", SaveAgent)
 
 # 将智能体路由添加到应用
-app.include_router(text_reviewer.router)
-# 添加飞书回调路由
-app.include_router(feishu_router)
+app.include_router(dispatch_agent.router)
+app.include_router(fill_agent.router)
+app.include_router(save_agent.router)
+
+# 添加统一服务路由
+app.include_router(unified_service.router)
 
 # 添加根路径
 @app.get("/")
@@ -55,4 +66,4 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     logger.info("Starting Agents System")
-    uvicorn.run("main:app", host="0.0.0.0", port=8848, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)

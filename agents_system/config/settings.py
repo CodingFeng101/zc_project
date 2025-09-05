@@ -10,24 +10,19 @@ class Settings(BaseSettings):
     PROJECT_VERSION: str = Field(default="1.0.0", alias="PROJECT_VERSION")
     DEBUG: bool = Field(default=False, alias="DEBUG")
     
-    # Qwen大模型配置
-    QWEN_API_KEY: Optional[str] = Field(default=None, alias="QWEN_API_KEY")
-    QWEN_MODEL_NAME: str = Field(default="qwen-plus", alias="QWEN_MODEL_NAME")
-    QWEN_API_BASE: str = Field(default="https://dashscope.aliyuncs.com/api/v1", alias="QWEN_API_BASE")
-    
     # 豆包大模型配置
-    DOUBAO_API_KEY: Optional[str] = Field(default=None, alias="DOUBAO_API_KEY")
-    DOUBAO_MODEL_NAME: Optional[str] = Field(default=None, alias="DOUBAO_MODEL_NAME")
+    DOUBAO_API_KEY: Optional[str] = Field(default="15e0122b-bf1e-415f-873b-1cb6b39bb612", alias="DOUBAO_API_KEY")
+    DOUBAO_MODEL_NAME: Optional[str] = Field(default="doubao-1-5-pro-32k-250115", alias="DOUBAO_MODEL_NAME")
     
     # 日志配置
     LOG_LEVEL: str = Field(default="INFO", alias="LOG_LEVEL")
     LOG_FILE: Optional[str] = Field(default="logs/agents_system.log", alias="LOG_FILE")
-    
-    # 飞书配置
-    FEISHU_APP_ID: Optional[str] = Field(default=None, alias="FEISHU_APP_ID")
-    FEISHU_APP_SECRET: Optional[str] = Field(default=None, alias="FEISHU_APP_SECRET")
-    FEISHU_VERIFY_TOKEN: Optional[str] = Field(default=None, alias="FEISHU_VERIFY_TOKEN")
-    FEISHU_ENCRYPT_KEY: Optional[str] = Field(default=None, alias="FEISHU_ENCRYPT_KEY")
+
+    DB_HOST: str = "localhost"
+    DB_NAME: str = "zhongcan_RAG"
+    DB_USER: str = "root"
+    DB_PASSWORD: str = "12345678"
+    EMBEDDING_MODEL: str = "doubao-embedding-large-text-250515"
     
     class Config:
         env_file = os.path.join(os.path.dirname(__file__), "..", ".env")

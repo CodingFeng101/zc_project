@@ -3,10 +3,11 @@ import os
 from typing import Dict, Type, Any, Optional
 from fastapi import APIRouter
 
+from agents_system.utils.logger import get_logger
+
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utils.logger import get_logger
 
 logger = get_logger(__name__)
 

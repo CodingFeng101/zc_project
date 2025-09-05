@@ -4,10 +4,11 @@ import sys
 import inspect
 from typing import Optional
 
+from agents_system.config.settings import settings
+
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from config.settings import settings
 
 
 class AgentLogger:
