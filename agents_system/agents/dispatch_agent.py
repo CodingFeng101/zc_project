@@ -124,11 +124,11 @@ class DispatchAgent(BaseAgent):
 
         # 提取第一个数字字符
         for char in cleaned_response:
-            if char in ['1', '2']:
+            if char in ['1', '2', '3']:
                 return char
 
         # 如果没有找到有效路由码，默认返回2
-        return "2"
+        return "3"
 
     async def dispatch_route(self, request: DispatchRequest) -> DispatchResponse:
         """

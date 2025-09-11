@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import json
 from typing import Any, List, Dict
 from pydantic import BaseModel
 from fastapi import APIRouter
@@ -17,7 +17,7 @@ class SaveRequest(BaseModel):
     :param form: 当前表单状态
     """
     conversations: List[Dict[str, str]]
-    form: str = ""
+    form: Dict[str, Any] = {}
 
 
 class SaveResponse(BaseModel):
@@ -28,7 +28,7 @@ class SaveResponse(BaseModel):
     :param success: 处理是否成功
     :param message: 处理结果消息
     """
-    updated_form: str | None
+    updated_form: Dict[str, Any] = {}
     success: bool
     message: str
 
@@ -61,7 +61,7 @@ class SaveAgent(BaseAgent):
             current_form = data.get("form", "")
             
             # 构建提示词
-            prompt = self._build_prompt(conversations, current_form)
+            prompt = self._build_prompt(conversations, json.dumps(current_form))
             
             # 调用大模型进行表单更新
             response = await self.doubao_client.generate_text(prompt)
@@ -69,10 +69,8 @@ class SaveAgent(BaseAgent):
             # 处理响应
             updated_form = self._process_response(response)
             
-            logger.info(f"表单信息识别与更新完成，更新结果: {'有更新' if updated_form != 'null' else '无更新'}")
-            
             return {
-                "updated_form": updated_form if updated_form != "null" else current_form,
+                "updated_form": updated_form if updated_form != {} else current_form,
                 "success": True,
                 "message": "表单信息识别与更新成功"
             }
@@ -113,7 +111,7 @@ class SaveAgent(BaseAgent):
         except Exception as e:
             logger.error(f"读取 save.txt 文件失败: {str(e)}")
 
-    def _process_response(self, response: str) -> str:
+    def _process_response(self, response: str) -> Dict[str, Any]:
         """
         处理模型响应
         
@@ -125,9 +123,11 @@ class SaveAgent(BaseAgent):
         
         # 如果响应为空或者明确是null，返回null
         if not cleaned_response or cleaned_response.lower() == "null":
-            return "null"
+            return {}
+
+        response = json.loads(cleaned_response)
         
-        return cleaned_response
+        return response
     
     async def save_route(self, request: SaveRequest) -> SaveResponse:
         """
@@ -141,7 +141,6 @@ class SaveAgent(BaseAgent):
                 "conversations": request.conversations,
                 "form": request.form
             })
-            print(result["updated_form"])
             return SaveResponse(
                 updated_form=result["updated_form"],
                 success=result["success"],

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from pydantic import BaseModel
 from fastapi import APIRouter
@@ -19,7 +19,7 @@ class UnifiedRequest(BaseModel):
     :param form: 表单列表
     :param conversations: 聊天记录
     """
-    form: str | None = ""
+    form: Dict[str, Any] = {}
     conversations: List[Dict[str, str]]
     status: str = "1"
 
@@ -34,10 +34,10 @@ class UnifiedResponse(BaseModel):
     :param status: 处理状态，1表示成功，0表示失败
     :param reference: 参考信息
     """
-    form: str | None = ""
+    form: Dict[str, Any] = {}
     is_manual: bool = False
     agent_response: str | None = ""
-    status: str = "1"
+    status: str = "0"
     reference: str | None = ""
 
 
@@ -87,6 +87,12 @@ class UnifiedService:
             elif route_code == "2":
                 # 转接至全局QA智能体（预留接口）
                 return await self._handle_global_qa(request)
+            elif route_code == "3":
+                return UnifiedResponse(
+                    agent_response="好的，现在可以【开始选号】了。",
+                    form=request.form,
+                    status="0",
+                )
             else:
                 return UnifiedResponse(
                     form=request.form,
