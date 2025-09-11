@@ -14,10 +14,10 @@ class FillRequest(BaseModel):
     选号需求填写请求模型
     
     :param conversations: 聊天历史记录
-    :param form: 当前表单状态
+    # :param form: 当前表单状态
     """
     conversations: List[Dict[str, str]]
-    form: str = ""
+    # form: str = ""
 
 
 class FillResponse(BaseModel):
@@ -123,7 +123,7 @@ class FillAgent(BaseAgent):
         try:
             result = await self.process({
                 "conversations": request.conversations,
-                "form": request.form
+                # "form": request.form
             })
             
             return FillResponse(

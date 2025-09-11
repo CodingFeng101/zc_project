@@ -91,6 +91,7 @@ class UnifiedService:
                 return UnifiedResponse(
                     form=request.form,
                     agent_response="",
+                    status="1"
                 )
                 
         except Exception as e:
@@ -110,7 +111,7 @@ class UnifiedService:
             # 步骤3：调用选号智能体
             fill_request = FillRequest(
                 conversations=request.conversations,
-                form=request.form
+                # form=request.form
             )
 
             fill_response = await self.fill_agent.fill_route(fill_request)

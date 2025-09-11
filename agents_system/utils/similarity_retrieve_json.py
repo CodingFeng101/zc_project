@@ -38,24 +38,25 @@ def cosine_similarity(vector_a: List[float], vector_b: List[float]) -> float:
     return np.clip(dot_product / (norm_a * norm_b), -1.0, 1.0)
 
 
-async def search_similar_in_group(query: str, group_uuid: str, top_n: int = 5, file_name: str = r"D:\PycharmProjects\zc_project\agents_system\utils\QAsql.json"):
+async def search_similar_in_group(query: str, group_uuid: str, top_n: int = 5, file_path: str = r"D:\PycharmProjects\zc_project\agents_system\data\QAsql.json"):
     """在指定组内搜索最相似的句子（从JSON文件中检索）"""
+    # current_dir = os.path.dirname(os.path.abspath(__file__))
+    # # 拼接得到文件的完整路径
+    # file_path = os.path.join(current_dir, file_name)
+
     # 1. 获取查询句子的向量
     query_vectors = await batch_get_vectors([query])
     query_vector = query_vectors[query]
 
     # 2. 从JSON文件获取指定组的句子向量
     try:
-        if not os.path.exists(file_name):
-            print(f"文件 {file_name} 不存在")
+        if not os.path.exists(file_path):  # 使用拼接后的完整路径
+            print(f"文件 {file_path} 不存在")
+            return []
 
         # 读取JSON文件内容
-        with open(file_name, 'r', encoding='utf-8') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:  # 使用完整路径
             data = json.load(f)
-
-        # 确保数据是列表格式
-        if not isinstance(data, list):
-            data = [data]
 
         # 查找指定group_uuid的组
         target_group = next((group for group in data if group.get("group_uuid") == group_uuid), None)

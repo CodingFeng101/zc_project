@@ -1,6 +1,9 @@
 import sys
 import os
 
+from agents_system.agents.jianlian_agent.conversation_processor_agent import ConversationProcessorAgent
+from agents_system.agents.jianlian_agent.rebate_identification_agent import RebateIdentificationAgent
+
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -37,15 +40,22 @@ app.add_middleware(
 dispatch_agent = DispatchAgent()
 fill_agent = FillAgent()
 save_agent = SaveAgent()
+conversation_processor_agent = ConversationProcessorAgent()
+rebate_identification_agent = RebateIdentificationAgent()
 
 registry.register("dispatch_agent", DispatchAgent)
 registry.register("fill_agent", FillAgent)
 registry.register("save_agent", SaveAgent)
+registry.register("conversation_processor_agent", ConversationProcessorAgent)
+registry.register("rebate_identification_agent", RebateIdentificationAgent)
+
 
 # 将智能体路由添加到应用
 app.include_router(dispatch_agent.router)
 app.include_router(fill_agent.router)
 app.include_router(save_agent.router)
+app.include_router(conversation_processor_agent.router)
+app.include_router(rebate_identification_agent.router)
 
 # 添加统一服务路由
 app.include_router(unified_service.router)
