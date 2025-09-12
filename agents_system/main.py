@@ -3,6 +3,7 @@ import os
 
 from agents_system.agents.jianlian_agent.conversation_processor_agent import ConversationProcessorAgent
 from agents_system.agents.jianlian_agent.rebate_identification_agent import RebateIdentificationAgent
+from agents_system.core.second_bargaining_service import SecondBargaining_service
 
 # 添加项目根目录到Python路径
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -59,6 +60,7 @@ app.include_router(rebate_identification_agent.router)
 
 # 添加统一服务路由
 app.include_router(unified_service.router)
+app.include_router(SecondBargaining_service.router)
 
 # 添加根路径
 @app.get("/")

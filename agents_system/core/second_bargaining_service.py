@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from typing import List, Dict, Any
-
 from pydantic import BaseModel
 from fastapi import APIRouter
 
-from agents_system.agents.dispatch_agent import DispatchAgent, DispatchRequest
-from agents_system.agents.fill_agent import FillAgent, FillRequest
-from agents_system.agents.globalqaagent import GlobalQARequest, GlobalQAgent
-from agents_system.agents.save_agent import SaveAgent, SaveRequest
+from agents_system.agents.second_bargaining_agent.dispatch_agent import DispatchAgent, DispatchRequest
+from agents_system.agents.second_bargaining_agent.fill_agent import FillAgent, FillRequest
+from agents_system.agents.second_bargaining_agent.globalqaagent import GlobalQARequest, GlobalQAgent
+from agents_system.agents.second_bargaining_agent.save_agent import SaveAgent, SaveRequest
 from agents_system.models.doubao import logger
 
 
-class UnifiedRequest(BaseModel):
+class SecondBargainingRequest(BaseModel):
     """
     统一API请求模型
-    
+
     :param form: 表单列表
     :param conversations: 聊天记录
     """
@@ -24,10 +23,10 @@ class UnifiedRequest(BaseModel):
     status: str = "1"
 
 
-class UnifiedResponse(BaseModel):
+class SecondBargainingResponse(BaseModel):
     """
     统一API响应模型
-    
+
     :param form: 更新后的表单
     :param is_manual: 是否转人工
     :param agent_response: 智能体回复内容
@@ -41,26 +40,26 @@ class UnifiedResponse(BaseModel):
     reference: str | None = ""
 
 
-class UnifiedService:
+class SecondBargainingService:
     """统一服务，封装三个智能体的完整流程"""
-    
+
     def __init__(self):
         self.dispatch_agent = DispatchAgent()
         self.fill_agent = FillAgent()
         self.save_agent = SaveAgent()
         self.globalqa_agent = GlobalQAgent()
-        self.router = APIRouter(prefix="/unified")
+        self.router = APIRouter(prefix="/secondbargaining")
         self._setup_routes()
-        logger.info("Initialized UnifiedService")
-    
+        logger.info("Initialized SecondBargainingService")
+
     def _setup_routes(self) -> None:
         """设置路由"""
-        self.router.post("/process", response_model=UnifiedResponse)(self.process_request)
-    
-    async def process_request(self, request: UnifiedRequest) -> UnifiedResponse:
+        self.router.post("/process", response_model=SecondBargainingResponse)(self.process_request)
+
+    async def process_request(self, request: SecondBargainingRequest) -> SecondBargainingResponse:
         """
         处理统一API请求
-        
+
         :param request: 统一请求对象
         """
         try:
@@ -68,48 +67,46 @@ class UnifiedService:
             dispatch_request = DispatchRequest(
                 conversations=request.conversations
             )
-            
+
             dispatch_response = await self.dispatch_agent.dispatch_route(dispatch_request)
-            
+
             if not dispatch_response.success:
-                return UnifiedResponse(
+                return SecondBargainingResponse(
                     form=request.form,
                     agent_response="",
-                    status="1"
                 )
-            
+
             route_code = dispatch_response.route_code
             logger.info(f"Dispatch agent returned route code: {route_code}")
-            
+
             # 步骤2：根据路由代码处理
             if route_code == "1":
-                # 转接至选号智能体
+                # 转接至二次议价智能体
                 return await self._handle_fill_agent(request)
             elif route_code == "2":
                 # 转接至全局QA智能体（预留接口）
                 return await self._handle_global_qa(request)
             elif route_code == "3":
-                return UnifiedResponse(
-                    agent_response="好的，现在可以【开始选号】了。",
+                return SecondBargainingResponse(
+                    agent_response="好的，清单已确认，后续将按此推进合作",
                     form=request.form,
                     status="0",
                 )
             else:
-                return UnifiedResponse(
+                return SecondBargainingResponse(
                     form=request.form,
                     agent_response="",
                     status="1"
                 )
-                
+
         except Exception as e:
-            logger.error(f"Error processing unified request: {str(e)}")
-            return UnifiedResponse(
+            logger.error(f"Error processing SecondBargaining request: {str(e)}")
+            return SecondBargainingResponse(
                 form=request.form,
                 agent_response="",
-                status="1"
             )
 
-    async def _handle_fill_agent(self, request: UnifiedRequest) -> UnifiedResponse:
+    async def _handle_fill_agent(self, request: SecondBargainingRequest) -> SecondBargainingResponse:
         """
         处理选号智能体流程
 
@@ -125,10 +122,9 @@ class UnifiedService:
             fill_response = await self.fill_agent.fill_route(fill_request)
 
             if not fill_response.success:
-                return UnifiedResponse(
+                return SecondBargainingResponse(
                     form=request.form,
                     agent_response="",
-                    status="1"
                 )
             request.conversations.append({"role": "assistant", "content": fill_response.response})
             # 步骤5：调用保存智能体
@@ -143,29 +139,27 @@ class UnifiedService:
             logger.info(f"聊天记录:{request.conversations}")
 
             if not save_response.success:
-                return UnifiedResponse(
+                return SecondBargainingResponse(
                     form=request.form,
                     agent_response=fill_response.response,
-                    status="1"
                 )
 
             # 步骤6：返回最终结果
-            return UnifiedResponse(
+            return SecondBargainingResponse(
                 form=save_response.updated_form,
                 agent_response=fill_response.response,
-                status="1"
             )
 
         except Exception as e:
             logger.error(f"Error in fill agent flow: {str(e)}")
-            return UnifiedResponse(
+            return SecondBargainingResponse(
                 form=request.form,
                 agent_response="",
                 status="1",
                 reference="666"
             )
 
-    async def _handle_global_qa(self, request: UnifiedRequest) -> UnifiedResponse:
+    async def _handle_global_qa(self, request: SecondBargainingRequest) -> SecondBargainingResponse:
         """
         处理全局QA智能体流程（预留接口）
 
@@ -177,7 +171,7 @@ class UnifiedService:
             )
             qa_response = await self.globalqa_agent.qa_route(qa_request)
             if not qa_response.success:
-                return UnifiedResponse(
+                return SecondBargainingResponse(
                     form=request.form,
                     agent_response=qa_response.response,
                     is_manual=qa_response.is_manual,
@@ -187,7 +181,7 @@ class UnifiedService:
             logger.info(f"全局QA回答: {qa_response.response}")
             logger.info(f"转人工: {qa_response.is_manual}")
             logger.info(f"参考信息: {qa_response.reference}")
-            return UnifiedResponse(
+            return SecondBargainingResponse(
                 form=request.form,
                 is_manual=qa_response.is_manual,
                 agent_response=qa_response.response,
@@ -196,7 +190,7 @@ class UnifiedService:
             )
         except Exception as e:
             logger.error(f"Error in global QA flow: {str(e)}")
-            return UnifiedResponse(
+            return SecondBargainingResponse(
                 form=request.form,
                 agent_response="",
                 status="1",
@@ -205,4 +199,4 @@ class UnifiedService:
 
 
 # 全局统一服务实例
-unified_service = UnifiedService()
+SecondBargaining_service = SecondBargainingService()
