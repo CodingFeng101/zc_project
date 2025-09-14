@@ -38,7 +38,6 @@ class SecondBargainingResponse(BaseModel):
     agent_response: str | None = ""
     status: str = "1"
     reference: str | None = ""
-    cooperation_status: str = ""
 
 
 class SecondBargainingService:
@@ -144,9 +143,6 @@ class SecondBargainingService:
                     form=request.form,
                     agent_response=fill_response.response,
                 )
-
-            # 分析合作状态智能体
-
 
             # 步骤6：返回最终结果
             return SecondBargainingResponse(

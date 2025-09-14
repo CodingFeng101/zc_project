@@ -13,7 +13,7 @@ from agents_system.models.doubao import DoubaoModel, logger
 class DispatchRequest(BaseModel):
     """
     对话统筹与路由判断请求模型
-    
+
     :param conversations: 聊天历史记录
     """
     conversations: List[Dict[str, str]]
@@ -96,7 +96,7 @@ class DispatchAgent(BaseAgent):
             import os
             current_dir = os.path.dirname(os.path.abspath(__file__))
             prompt_file = os.path.join(current_dir, "dispatch.txt")
-            
+
             with open(prompt_file, 'r', encoding='utf-8') as f:
                 prompt_template = Template(f.read())
             # 替换模板中的占位符
@@ -106,9 +106,9 @@ class DispatchAgent(BaseAgent):
                 user_input=user_input
             )
             print("prompt:", prompt)
-            
+
             return prompt
-            
+
         except Exception as e:
             logger.error(f"读取 dispatch.txt 文件失败: {str(e)}")
 
@@ -139,13 +139,13 @@ class DispatchAgent(BaseAgent):
         """
         try:
             result = await self.process({"conversations": request.conversations})
-            
+
             return DispatchResponse(
                 route_code=result["route_code"],
                 success=result["success"],
                 message=result["message"]
             )
-            
+
         except Exception as e:
             logger.error(f"路由判断接口调用失败: {str(e)}")
             return DispatchResponse(

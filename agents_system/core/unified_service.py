@@ -90,7 +90,7 @@ class UnifiedService:
                 return await self._handle_global_qa(request)
             elif route_code == "3":
                 return UnifiedResponse(
-                    agent_response="好的，现在可以【开始选号】了。",
+                    agent_response="好的，现在可以【开始解析】了。",
                     form=request.form,
                     status="0",
                 )
