@@ -3,6 +3,9 @@ import os
 
 from agents_system.agents.jianlian_agent.conversation_processor_agent import ConversationProcessorAgent
 from agents_system.agents.jianlian_agent.rebate_identification_agent import RebateIdentificationAgent
+from agents_system.agents.choose_number_agent.dispatch_agent import DispatchAgent
+from agents_system.agents.choose_number_agent.fill_agent import FillAgent
+from agents_system.agents.choose_number_agent.save_agent import SaveAgent
 from agents_system.core.second_bargaining_service import SecondBargaining_service
 
 # 添加项目根目录到Python路径
@@ -12,10 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.settings import settings
 from core.registry import registry
-from agents.dispatch_agent import DispatchAgent
-from agents.fill_agent import FillAgent
-from agents.save_agent import SaveAgent
-from core.unified_service import unified_service
+from core.choose_number_service import unified_service
 
 from utils.logger import get_logger
 

@@ -5,10 +5,10 @@ from typing import List, Dict, Any
 from pydantic import BaseModel
 from fastapi import APIRouter
 
-from agents_system.agents.dispatch_agent import DispatchAgent, DispatchRequest
-from agents_system.agents.fill_agent import FillAgent, FillRequest
-from agents_system.agents.globalqaagent import GlobalQARequest, GlobalQAgent
-from agents_system.agents.save_agent import SaveAgent, SaveRequest
+from agents_system.agents.choose_number_agent.dispatch_agent import DispatchAgent, DispatchRequest
+from agents_system.agents.choose_number_agent.fill_agent import FillAgent, FillRequest
+from agents_system.agents.choose_number_agent.globalqaagent import GlobalQAgent, GlobalQARequest
+from agents_system.agents.choose_number_agent.save_agent import SaveAgent, SaveRequest
 from agents_system.models.doubao import logger
 
 
@@ -85,10 +85,10 @@ class UnifiedService:
             if route_code == "1":
                 # 转接至选号智能体
                 return await self._handle_fill_agent(request)
+            # elif route_code == "2":
+            #     # 转接至全局QA智能体（预留接口）
+            #     return await self._handle_global_qa(request)
             elif route_code == "2":
-                # 转接至全局QA智能体（预留接口）
-                return await self._handle_global_qa(request)
-            elif route_code == "3":
                 return UnifiedResponse(
                     agent_response="好的，现在可以【开始解析】了。",
                     form=request.form,
