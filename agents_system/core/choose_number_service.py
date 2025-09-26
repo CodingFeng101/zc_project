@@ -165,44 +165,5 @@ class UnifiedService:
                 reference="666"
             )
 
-    async def _handle_global_qa(self, request: UnifiedRequest) -> UnifiedResponse:
-        """
-        处理全局QA智能体流程（预留接口）
-
-        :param request: 原始请求
-        """
-        try:
-            qa_request = GlobalQARequest(
-                conversations=request.conversations
-            )
-            qa_response = await self.globalqa_agent.qa_route(qa_request)
-            if not qa_response.success:
-                return UnifiedResponse(
-                    form=request.form,
-                    agent_response=qa_response.response,
-                    is_manual=qa_response.is_manual,
-                    reference=qa_response.reference,
-                    status="1",
-                )
-            logger.info(f"全局QA回答: {qa_response.response}")
-            logger.info(f"转人工: {qa_response.is_manual}")
-            logger.info(f"参考信息: {qa_response.reference}")
-            return UnifiedResponse(
-                form=request.form,
-                is_manual=qa_response.is_manual,
-                agent_response=qa_response.response,
-                status="1",
-                reference="666"
-            )
-        except Exception as e:
-            logger.error(f"Error in global QA flow: {str(e)}")
-            return UnifiedResponse(
-                form=request.form,
-                agent_response="",
-                status="1",
-                reference="6"
-            )
-
-
 # 全局统一服务实例
 unified_service = UnifiedService()
